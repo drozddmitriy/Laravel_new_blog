@@ -8,6 +8,11 @@ use Cviebrock\EloquentSluggable\Sluggable;
 class Tag extends Model
 {
     use Sluggable;
+
+    /**
+     * Relations
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function posts(){
         return $this->belongsToMany(
             POst::class,
