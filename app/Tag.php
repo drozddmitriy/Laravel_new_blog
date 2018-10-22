@@ -9,6 +9,7 @@ class Tag extends Model
 {
     use Sluggable;
 
+    protected $fillable = ['title'];
     /**
      * Relations
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
