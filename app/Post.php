@@ -203,13 +203,11 @@ class Post extends Model
         return 'Нет Тегов';
     }
 
-/**
+
     public function getDateAttribute($value)
     {
         $date = Carbon::createFromFormat('Y-m-d', $value)->format('d/m/y');
-
         return $date;
     }
- */
 
 }

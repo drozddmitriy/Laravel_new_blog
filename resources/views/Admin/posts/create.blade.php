@@ -66,7 +66,7 @@
                         <!-- checkbox -->
                         <div class="form-group">
                             <label>
-                                <input name="is_features" type="checkbox" class="minimal">
+                                <input name="is_featured" type="checkbox" class="minimal">
                             </label>
                             <label>
                                 Рекомендовать
