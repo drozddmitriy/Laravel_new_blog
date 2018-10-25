@@ -14,13 +14,14 @@ class Post extends Model
     const IS_DRAFT = 0;
     const IS_PUBLIC = 1;
 
-    protected $fillable = ['title', 'content', 'date'];
+    protected $fillable = ['title', 'content', 'date', 'description'];
 
     /**
      * Relations
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 
@@ -28,7 +29,8 @@ class Post extends Model
      * Relations
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function author(){
+    public function author()
+    {
         return $this->belongsTo(User::class, 'user_id');
     }
 
@@ -36,7 +38,8 @@ class Post extends Model
      * Relations
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function tags(){
+    public function tags()
+    {
         return $this->belongsToMany(
             Tag::class,
             'post_tags',
@@ -59,7 +62,8 @@ class Post extends Model
      * @param $fields
      * @return Post
      */
-    public static function add($fields){
+    public static function add($fields)
+    {
         $post = new static;
         $post->fill($fields);
         $post->user_id = 1;
@@ -72,7 +76,8 @@ class Post extends Model
      * Edit post
      * @param $fields
      */
-    public function edit($fields){
+    public function edit($fields)
+    {
         $this->fill($fields);
         $this->save();
     }
@@ -80,28 +85,34 @@ class Post extends Model
     /**
      * Remove post
      */
-    public function remove(){
+    public function remove()
+    {
         ///delete image
         $this->removeImage();
         $this->delete();
     }
 
 
-    public function removeImage(){
-        if ($this->image != null ) {
+    public function removeImage()
+    {
+        if ($this->image != null) {
             Storage::delete('uploads/' . $this->image);
         }
     }
+
     /**
      * Upload image
      * @param $image
      */
-    public function uploadImage($image){
+    public function uploadImage($image)
+    {
 
-        if($image == null){return;}
+        if ($image == null) {
+            return;
+        }
 
         $this->removeImage();
-        $filename = str_random(10). '.' . $image->extension();
+        $filename = str_random(10) . '.' . $image->extension();
         $image->storeAs('uploads', $filename);
         $this->image = $filename;
         $this->save();
@@ -111,8 +122,9 @@ class Post extends Model
      * Get Image
      * @return string
      */
-    public function getImage(){
-        if($this->image == null) {
+    public function getImage()
+    {
+        if ($this->image == null) {
             return '/img/no-image.png';
         }
         return '/uploads/' . $this->image;
@@ -122,8 +134,11 @@ class Post extends Model
      * Set category
      * @param $id
      */
-    public function setCategory($id){
-        if($id == null){return;}
+    public function setCategory($id)
+    {
+        if ($id == null) {
+            return;
+        }
         $this->category_id = $id;
         $this->save();
     }
@@ -132,29 +147,35 @@ class Post extends Model
      * Set Tags
      * @param $ids
      */
-    public function setTags($ids){
-        if($ids == null){return;}
+    public function setTags($ids)
+    {
+        if ($ids == null) {
+            return;
+        }
         $this->tags()->sync($ids);
     }
 
     /**
      * Set status
      */
-    public function setDraft(){
-    $this->status = Post::IS_DRAFT;
-    $this->save();
+    public function setDraft()
+    {
+        $this->status = Post::IS_DRAFT;
+        $this->save();
     }
 
     /**
      * Set status
      */
-    public function setPublic(){
+    public function setPublic()
+    {
         $this->status = Post::IS_PUBLIC;
         $this->save();
     }
 
-    public function taggleStatus($value){
-        if ($value == null){
+    public function taggleStatus($value)
+    {
+        if ($value == null) {
             return $this->setDraft();
         }
         return $this->setPublic();
@@ -163,7 +184,8 @@ class Post extends Model
     /**
      * Set Featured
      */
-    public function setFeatured(){
+    public function setFeatured()
+    {
         $this->is_featured = 1;
         $this->save();
     }
@@ -171,13 +193,15 @@ class Post extends Model
     /**
      * Set Featured
      */
-    public function setStandart(){
+    public function setStandart()
+    {
         $this->is_featured = 0;
         $this->save();
     }
 
-    public function taggleFeatured($value){
-        if ($value == null){
+    public function taggleFeatured($value)
+    {
+        if ($value == null) {
             return $this->setStandart();
         }
         return $this->setFeatured();
@@ -185,19 +209,21 @@ class Post extends Model
 
     public function setDateAttribute($value)
     {
-       $date = Carbon::createFromFormat('d/m/y', $value)->format('Y-m-d');
-       $this->attributes['date'] = $date;
+        $date = Carbon::createFromFormat('d/m/y', $value)->format('Y-m-d');
+        $this->attributes['date'] = $date;
     }
 
-    public function getCategoryTitle(){
-            if($this->category != null){
-                return $this->category->title;
-            }
-            return 'Нет категории';
+    public function getCategoryTitle()
+    {
+        if ($this->category != null) {
+            return $this->category->title;
+        }
+        return 'Нет категории';
     }
 
-    public function getTagsTitles(){
-        if(!$this->tags->isEmpty()){
+    public function getTagsTitles()
+    {
+        if (!$this->tags->isEmpty()) {
             return implode(', ', $this->tags->pluck('title')->all());
         }
         return 'Нет Тегов';
@@ -210,4 +236,45 @@ class Post extends Model
         return $date;
     }
 
+    public function getCategoryID()
+    {
+        return $this->category != null ? $this->category->id : null;
+    }
+
+    public function getDate()
+    {
+        return Carbon::createFromFormat('d/m/y', $this->date)->format('F d, Y');
+    }
+
+    public function hasPrevious()
+    {
+        return self::where('id', '<', $this->id)->max('id');
+    }
+
+    public function getPrevious()
+    {
+        $postID = $this->hasPrevious(); //ID
+        return self::find($postID);
+    }
+
+    public function hasNext()
+    {
+        return self::where('id', '>', $this->id)->min('id');
+    }
+
+    public function getNext()
+    {
+        $postID = $this->hasNext();
+        return self::find($postID);
+    }
+    public function related()
+    {
+        ///Vse krome tekychego
+        return self::all()->except($this->id);
+    }
+
+    public function hasCategory()
+    {
+        return $this->category != null ? true : false;
+    }
 }
