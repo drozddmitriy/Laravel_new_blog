@@ -9,9 +9,11 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index(){
+    public function index()
+    {
+        //dd(\Auth::check());
         $posts = Post::paginate(2);
-       // dd($posts);
+
         return view('pages.index')->with('posts', $posts);
     }
     public function show($slug)
