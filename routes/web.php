@@ -16,12 +16,18 @@ Route::get('/posts/{slug}','HomeController@show')->name('post.show');
 Route::get('/tag/{slug}', 'HomeController@tag')->name('tag.show');
 Route::get('/category/{slug}', 'HomeController@category')->name('category.show');
 
-Route::get('/register', 'AuthController@registerForm');
-Route::post('/register', 'AuthController@register');
-Route::get('/login','AuthController@loginForm')->name('login');
-Route::post('/login', 'AuthController@login');
+Route::group(['middleware'	=>	'auth'], function(){
+    Route::get('/logout', 'AuthController@logout');
+});
 
-Route::group(['prefix'=>'admin', 'namespace'=>'Admin'],function (){
+Route::group(['middleware'	=>	'guest'], function(){
+    Route::get('/register', 'AuthController@registerForm');
+    Route::post('/register', 'AuthController@register');
+    Route::get('/login','AuthController@loginForm')->name('login');
+    Route::post('/login', 'AuthController@login');
+});
+
+Route::group(['prefix'=>'admin', 'namespace'=>'Admin', 'middleware'=>'admin'],function (){
     Route::get('/','DashboardController@index');
     Route::resource('/categories', 'CategoriesController');
     Route::resource('/users', 'UsersController');
