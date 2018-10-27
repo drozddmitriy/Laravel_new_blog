@@ -1,12 +1,16 @@
 @extends('layout')
 
-
 @section('content')
     <!--main content start-->
     <div class="main-content">
         <div class="container">
             <div class="row">
                 <div class="col-md-8">
+                    @if(session('status'))
+                        <div class="alert alert-success">
+                            {{session('status')}}
+                        </div>
+                    @endif
                     <article class="post">
                         <div class="post-thumb">
                             <a href="{{route('post.show', $post->slug)}}"><img src="{{$post->getImage()}}" alt=""></a>
@@ -32,7 +36,7 @@
 
                             <div class="social-share">
 							<span
-                                    class="social-share-title pull-left text-capitalize">By Rubel On {{$post->getDate()}}</span>
+                                    class="social-share-title pull-left text-capitalize">By {{$post->author->name}} On {{$post->getDate()}}</span>
                                 <ul class="text-center pull-right">
                                     <li><a class="s-facebook" href="#"><i class="fa fa-facebook"></i></a></li>
                                     <li><a class="s-twitter" href="#"><i class="fa fa-twitter"></i></a></li>
@@ -64,7 +68,6 @@
                                                 <h5>{{$post->getPrevious()->title}}</h5>
                                             </div>
                                         </div>
-
 
                                     </a>
                                 </div>
@@ -105,65 +108,52 @@
 
                         </div>
                     </div><!--related post carousel-->
-                    <div class="bottom-comment"><!--bottom comment-->
-                        <h4>3 comments</h4>
 
-                        <div class="comment-img">
-                            <img class="img-circle" src="/images/comment-img.jpg" alt="">
-                        </div>
+                        @if(!$post->comments->isEmpty())
+                            @foreach($post->getComments() as $comment)
+                                <div class="bottom-comment">
+                                    <div class="comment-img">
+                                        <img class="img-circle" src="{{$comment->author->getAvatar()}}" alt="" width="75" height="75">
+                                    </div>
 
-                        <div class="comment-text">
-                            <a href="#" class="replay btn pull-right"> Replay</a>
-                            <h5>Rubel Miah</h5>
+                                    <div class="comment-text">
+                                        <h5>{{$comment->author->name}}</h5>
 
-                            <p class="comment-date">
-                                December, 02, 2015 at 5:57 PM
-                            </p>
+                                        <p class="comment-date">
+                                            {{$comment->created_at->diffForHumans()}}
+                                        </p>
 
+                                        <p class="para">{{$comment->text}}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
 
-                            <p class="para">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-                                diam nonumy
-                                eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-                                voluptua. At vero eos et cusam et justo duo dolores et ea rebum.</p>
-                        </div>
-                    </div>
                     <!-- end bottom comment-->
+                    @if(Auth::check())
+                            <div class="leave-comment"><!--leave comment-->
+                                <h4>Leave a reply</h4>
 
 
-                    <div class="leave-comment"><!--leave comment-->
-                        <h4>Leave a reply</h4>
+                                    <form class="form-horizontal contact-form" role="form" method="post" action="/comment">
+                                        {{csrf_field()}}
+                                        <input type="hidden" name="post_id" value="{{$post->id}}">
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+    										<textarea class="form-control" rows="6" name="message"
+                                                      placeholder="Write Massage"></textarea>
+                                            </div>
+                                        </div>
+                                        <button class="btn send-btn">Post Comment</button>
+                                    </form>
+                            </div><!--end leave comment-->
 
-
-                        <form class="form-horizontal contact-form" role="form" method="post" action="#">
-                            <div class="form-group">
-                                <div class="col-md-6">
-                                    <input type="text" class="form-control" id="name" name="name" placeholder="Name">
-                                </div>
-                                <div class="col-md-6">
-                                    <input type="email" class="form-control" id="email" name="email"
-                                           placeholder="Email">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-md-12">
-                                    <input type="text" class="form-control" id="subject" name="subject"
-                                           placeholder="Website url">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-12">
-										<textarea class="form-control" rows="6" name="message"
-                                                  placeholder="Write Massage"></textarea>
-                                </div>
-                            </div>
-                            <a href="#" class="btn send-btn">Post Comment</a>
-                        </form>
-                    </div><!--end leave comment-->
+                        @endif
                 </div>
                 @include('pages._sidebar')
         </div>
     </div>
+</div>
     <!-- end main content-->
 
-    @endsection
+@endsection

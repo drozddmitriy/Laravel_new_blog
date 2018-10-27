@@ -11,7 +11,7 @@ class Comment extends Model
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
    public function post(){
-       return $this->hasOne(Post::class);
+       return $this->belongsTo(Post::class);
    }
 
     /**
@@ -19,7 +19,7 @@ class Comment extends Model
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
    public function author(){
-       return $this->hasOne(User::class);
+       return $this->belongsTo(User::class, 'user_id');
    }
 
     /**
