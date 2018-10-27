@@ -14,7 +14,6 @@ class Subscription extends Model
     public static function add($email){
         $sub = new static;
         $sub->email = $email;
-        $sub->token = str_random(100);
         $sub->save();
 
         return $sub;
@@ -25,5 +24,11 @@ class Subscription extends Model
      */
     public function remove(){
         $this->delete();
+    }
+
+    public function generateToken()
+    {
+        $this->token = str_random(100);
+        $this->save();
     }
 }
