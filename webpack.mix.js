@@ -67,3 +67,7 @@ mix.scripts([
 
 mix.copy('resources/assets/front/fonts', 'public/fonts');
 mix.copy('resources/assets/front/images', 'public/images');
+
+mix.combine([
+    'resources/assets/front/css/style1.css'
+],'public/css/error.css');
